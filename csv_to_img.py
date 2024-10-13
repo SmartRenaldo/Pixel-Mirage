@@ -1,9 +1,17 @@
 import os
 import pandas as pd
 from PIL import Image
+import argparse
 
-# Path to the CSV file
-csv_path = "images/csv/6(ps).csv"  # Replace with your CSV file path
+# Setup argument parser
+parser = argparse.ArgumentParser(description="Convert a CSV to an image.")
+parser.add_argument('--path', type=str, default="images/csv/6(ps).csv", help='Path to the CSV file (optional)')
+
+# Parse arguments
+args = parser.parse_args()
+
+# Path to the CSV file (provided as an argument or default)
+csv_path = args.csv_path
 
 # Read the CSV file into a DataFrame
 df = pd.read_csv(csv_path, header=None)
@@ -25,7 +33,7 @@ for y in range(height):
         
         # Set the pixel in the image
         image.putpixel((x, y), rgb_tuple)
-        
+
 # Create the 'restored_images' folder if it doesn't exist
 img_folder = "images/restored_images"
 os.makedirs(img_folder, exist_ok=True)

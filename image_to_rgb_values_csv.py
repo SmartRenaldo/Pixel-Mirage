@@ -1,13 +1,23 @@
 import os
 from PIL import Image
 import pandas as pd
+import argparse
+
+# Setup argument parser
+parser = argparse.ArgumentParser(description="Convert an image to a CSV file of RGB values.")
+parser.add_argument('--path', type=str, default="images/6(ps).png", help='Path to the image file (optional)')
+
+# Parse arguments
+args = parser.parse_args()
+
+# Path to the image file (provided as an argument or default)
+image_path = args.path
 
 # Load the image
-image_path = "images/6(ps).png"
 image = Image.open(image_path)
 
 # Convert the image to RGB mode
-rgb_image = image.convert("RGB")
+rgb_image = image.convert("RGBA")
 
 # Get the size of the image
 width, height = rgb_image.size
@@ -20,9 +30,14 @@ for y in range(height):
     row = []
     for x in range(width):
         # Get the RGB values of the pixel at (x, y)
-        r, g, b = rgb_image.getpixel((x, y))
-        # Store the RGB values as a string like "(R, G, B)"
-        row.append(f"({r}, {g}, {b})")
+        r, g, b, a = rgb_image.getpixel((x, y))
+        
+        # Check if the pixel is fully transparent (empty)
+        if a == 0:
+            row.append("T")
+        # Otherwise, store the RGB values
+        else:
+            row.append(f"({r}, {g}, {b})")
     data.append(row)
 
 # Convert the data into a DataFrame
