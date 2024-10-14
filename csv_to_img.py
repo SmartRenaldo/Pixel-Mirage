@@ -11,7 +11,7 @@ parser.add_argument('--path', type=str, default="images/csv/6(ps).csv", help='Pa
 args = parser.parse_args()
 
 # Path to the CSV file (provided as an argument or default)
-csv_path = args.csv_path
+csv_path = args.path
 
 # Read the CSV file into a DataFrame
 df = pd.read_csv(csv_path, header=None)

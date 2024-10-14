@@ -73,21 +73,15 @@ def analyze_image(image_path):
         dfs_with_blank_cols.append(df_dict[group])
         dfs_with_blank_cols.append(pd.DataFrame({"": [""] * len(df_dict[group])}))  # Add blank column
     
+    # Remove the last blank column (after the last group)
+    dfs_with_blank_cols = dfs_with_blank_cols[:-1]
     
     # Concatenate DataFrames
     combined_df = pd.concat(dfs_with_blank_cols, axis=1)
 
-    # Append an empty column to separate groups from the overall average
-    empty_col_df = pd.DataFrame({"": [""] * len(combined_df)})
-
     # Append the overall average R, G, B
     overall_avg_df = pd.DataFrame({"Value": ["Avg"], "R": [avg_r_total], "G": [avg_g_total], "B": [avg_b_total]})
-    
-    # Concatenate the empty column with the overall average
-    overall_avg_with_empty_col = pd.concat([empty_col_df, overall_avg_df], axis=1)
-    
-    # Append the overall group with an empty column to the combined DataFrame
-    combined_df = pd.concat([combined_df, overall_avg_with_empty_col], axis=1)
+    combined_df = pd.concat([combined_df, overall_avg_df], axis=1)
 
     # Create the output directory if it doesn't exist
     output_dir = './images/csv'
