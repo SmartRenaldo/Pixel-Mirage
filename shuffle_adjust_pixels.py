@@ -4,6 +4,7 @@ import pandas as pd
 import random
 import argparse
 import numpy as np
+from datetime import datetime
 
 # Setup argument parser
 parser = argparse.ArgumentParser(description="Convert an image to a CSV file of RGB values.")
@@ -22,12 +23,16 @@ image = Image.open(image_path).convert("RGBA")
 width, height = image.size
 
 # Prepare data storage for pixels by group and for transparent pixels
-groups = {i: [] for i in range(1, 11)}  # 10 groups for non-transparent pixels
-group_positions = {i: [] for i in range(1, 11)}  # Store original positions of each group
+groups = {i: [] for i in range(1, 13)}  # 12 groups for non-transparent pixels
+group_positions = {i: [] for i in range(1, 13)}  # Store original positions of each group
 transparent_pixels = []  # Store transparent pixel positions and values
 
 # Group criteria based on r+g+b
-group_criteria = [(0, 60), (61, 140), (141, 220), (221, 300), (301, 380), (381, 460), (461, 540), (541, 620), (621, 700), (701, float('inf'))]
+group_criteria = [
+    (0, 60), (61, 120), (121, 180), (181, 240), (241, 300), 
+    (301, 360), (361, 420), (421, 480), (481, 540), 
+    (541, 620), (621, 705), (706, float('inf'))
+]
 
 # Function to determine which group a pixel belongs to based on its r+g+b sum
 def get_group(rgb_sum):
@@ -80,14 +85,17 @@ def process_group(group, group_position):
         image.putpixel((x, y), (*adjusted_group[i], 255))  # Add alpha as 255 for opaque pixels
 
 # Process each group
-for group_num in range(1, 11):
+for group_num in range(1, 13):
     process_group(groups[group_num], group_positions[group_num])
 
 # Restore transparent pixels in their original positions
 for (x, y), (r, g, b, a) in transparent_pixels:
     image.putpixel((x, y), (r, g, b, a))  # Keep the original transparent pixel as it is
 
+# Generate a timestamp for the file prefix
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
 # Save the modified image
-output_image_path = f"images/restored_images/{os.path.splitext(os.path.basename(image_path))[0]}_modified.png"
+output_image_path = f"images/restored_images/{timestamp}_{os.path.splitext(os.path.basename(image_path))[0]}_modified.png"
 image.save(output_image_path)
 print(f"Modified image saved to: {output_image_path}")
