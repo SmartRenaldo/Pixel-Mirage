@@ -106,19 +106,44 @@ def special_modify(pixels):
 
     return pixels
 
+def create_blank_canvas(image, num_sections_width=2, num_sections_height=10):
+    """Create a blank canvas that is larger by num_sections_width * num_sections_height times the original dimensions."""
+    width, height = image.size
+    new_width = width * num_sections_width
+    new_height = height * num_sections_height
+    # Create a blank image (new width and new height, same mode)
+    return Image.new(image.mode, (new_width, new_height))
+
+def process_and_place(image, canvas, section_row, section_col):
+    """Process the image and place it in the specified row and column of the canvas."""
+    # Apply shuffle and modification logic on the image
+    pixels = shuffle_pixels(image)
+    pixels = modify_rgb_values(pixels)
+    pixels = special_modify(pixels)
+    
+    # Convert pixels back to an image
+    processed_image = Image.fromarray(pixels.astype('uint8'))
+    
+    # Paste the processed image onto the canvas at the correct location
+    width, height = image.size
+    x_offset = section_col * width  # Column offset
+    y_offset = section_row * height  # Row offset
+    canvas.paste(processed_image, (x_offset, y_offset))
+
 def process_image(image_path=None):
-    """Main function to process the image."""
-    # Load image
+    """Main function to process the image and generate a larger image with 20 sections."""
+    # Load the original image
     image = load_image(image_path)
     
-    # Shuffle pixels
-    pixels = shuffle_pixels(image)
+    # Create a blank canvas 2 times wider and 10 times taller than the original image
+    num_sections_width = 2
+    num_sections_height = 10  # Adjust this value if you need a different number of sections
+    canvas = create_blank_canvas(image, num_sections_width, num_sections_height)
     
-    # Modify RGB values
-    pixels = modify_rgb_values(pixels)
-    
-    # Special modifications based on R + G + B values
-    pixels = special_modify(pixels)
+    # Process and place the image into each section of the canvas
+    for section_row in range(num_sections_height):
+        for section_col in range(num_sections_width):
+            process_and_place(image, canvas, section_row, section_col)
     
     # Create the output directory if it doesn't exist
     output_dir = "./images/restored_images"
@@ -129,9 +154,8 @@ def process_image(image_path=None):
     output_filename = f"{timestamp}_outer_glow_image.png"
     output_path = os.path.join(output_dir, output_filename)
     
-    # Save the modified image
-    modified_image = Image.fromarray(pixels.astype('uint8'))
-    modified_image.save(output_path)
+    # Save the final larger image
+    canvas.save(output_path)
     print(f"Outer glow image saved as '{output_path}'")
 
 if __name__ == "__main__":
