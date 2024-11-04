@@ -53,7 +53,7 @@ def main(image_path):
     r_prob, g_prob, b_prob = calculate_rgb_probabilities(img)
     
     # Generate a new image based on calculated probabilities
-    new_image = generate_image(r_prob, g_prob, b_prob, size=(500, 500))
+    new_image = generate_image(r_prob, g_prob, b_prob, size=(200, 200))
     
     # Get the current timestamp and format it
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
